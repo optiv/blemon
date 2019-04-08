@@ -11,7 +11,7 @@ BLE Monitor script being run on Android as an Objection Plugin while monitoring 
 BLE Monitor script being run directly in Frida on iOS while monitoring a BLE enabled padlock app.
 ## Features
 - Automatically detects target operating system (iOS or Android) and runs appropriate hooks
-- Designed to be universal so that BLE events can be mointored regardless of the application code
+- Designed to be universal so that BLE events can be monitored regardless of the application code
 - Monitors characteristic reads, writes and notifications
 - Colorized output and chararcteristic UUID tagging for easier event monitoring
 - Data is always displayed in hexadecimal format to support binary payloads

@@ -33,12 +33,9 @@ if (Java.available) {
             var data = new ObjC.Object(args[2]);
             var CBChar = new ObjC.Object(args[3]);
             var dataBytes = Memory.readByteArray(data.bytes(), data.length());
-            var b = new Uint8Array(dataBytes);
-            var hexData = "";
-            for (var i = 0; i < b.length; i++) {
-                hexData += pad(b[i].toString(16), 2);
-            }
-            console.log(Color.Green + "[BLE Write  =>]" + Color.Light.Black + " UUID: " + CBChar.$ivars['_UUID'] + Color.Reset + " data: 0x" + hexData);
+            var buf = new Uint8Array(dataBytes);
+            var hexData = `length=${data.length()} bytes=0x${buf2hex(buf)}`;
+            console.log(Color.Green + "[BLE Write  =>]" + Color.Light.Black + " UUID: " + CBChar.$ivars['_UUID'] + Color.Reset + " data: " + hexData);
         }
     }); //end Interceptor
     Interceptor.attach(ObjC.classes.CBCharacteristic['- value'].implementation, {
@@ -47,13 +44,14 @@ if (Java.available) {
             // turns <12 34> into 1234
             var data = CBChar.$ivars['_value']
             if (data != null) {
-                data = data.toString().replace(/ /g, '').slice(1, -1)
+                var buf = data.bytes().readByteArray(data.length());
+                data = `length=${data.length()} bytes=0x${buf2hex(buf)}`
             }
             if (CBChar.$ivars['_isNotifying'] === true) {
-                console.log(Color.Cyan + "[BLE Notify <=]" + Color.Light.Black + " UUID: " + CBChar.$ivars['_UUID'] + Color.Reset + " data: 0x" + data);
+                console.log(Color.Cyan + "[BLE Notify <=]" + Color.Light.Black + " UUID: " + CBChar.$ivars['_UUID'] + Color.Reset + " data: " + data);
             }
             else {
-                console.log(Color.Blue + "[BLE Read   <=]" + Color.Light.Black + " UUID: " + CBChar.$ivars['_UUID'] + Color.Reset + " data: 0x" + data);
+                console.log(Color.Blue + "[BLE Read   <=]" + Color.Light.Black + " UUID: " + CBChar.$ivars['_UUID'] + Color.Reset + " data: " + data);
             }
         }
     }); //end Interceptor 
@@ -74,6 +72,11 @@ function bytes2hex(array) {
         result += ('0' + (array[i] & 0xFF).toString(16)).slice(-2);
     return result;
 };
+function buf2hex(buffer) { // buffer is an ArrayBuffer
+    return [...new Uint8Array(buffer)]
+        .map(x => x.toString(16).padStart(2, '0'))
+        .join('');
+}
 function pad(num, size) {
     var s = num + "";
     while (s.length < size) s = "0" + s;

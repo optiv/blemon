@@ -38,10 +38,12 @@ if (Java.available) {
             console.log(Color.Green + "[BLE Write  =>]" + Color.Light.Black + " UUID: " + CBChar.$ivars['_UUID'] + Color.Reset + " data: " + hexData);
         }
     }); //end Interceptor
-    Interceptor.attach(ObjC.classes.CBCharacteristic['- value'].implementation, {
-        onEnter: function (args) {
-            var CBChar = new ObjC.Object(args[0]);
-            // turns <12 34> into 1234
+	Interceptor.attach(ObjC.classes.CBCharacteristic['- setValue:'].implementation, {
+		onEnter: function (args) {
+			this.CBChar = new ObjC.Object(args[0]);
+		},
+		onLeave: function (retval) {
+			let CBChar = this.CBChar;
             var data = CBChar.$ivars['_value']
             if (data != null) {
                 var buf = data.bytes().readByteArray(data.length());
